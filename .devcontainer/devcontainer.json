@@ -1,0 +1,39 @@
+{
+    "image": "ghcr.io/lmerynda/knightsofdarkness-dev:latest",
+    "features": {
+        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+        "ghcr.io/mikaello/devcontainer-features/modern-shell-utils:1": {}
+    },
+    "postCreateCommand": "java -version && node --version && cd browser && npm install",
+    "remoteUser": "vscode",
+    "name": "spring-play",
+    "forwardPorts": [
+        8080
+    ],
+    "customizations": {
+        "codespaces": {
+            "mounts": [
+                {
+                    "source": ".",
+                    "target": "/workspaces/projects",
+                    "type": "volume",
+                    "consistency": "cached"
+                }
+            ]
+        },
+        "vscode": {
+            "extensions": [
+                "redhat.java",
+                "vscjava.vscode-java-test",
+                "vscjava.vscode-java-debug",
+                "vscjava.vscode-gradle",
+                "mhutchie.git-graph",
+                "eamodio.gitlens",
+                "alefragnani.Bookmarks"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "zsh"
+            }
+        }
+    }
+}
