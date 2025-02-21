@@ -1,6 +1,8 @@
 package com.lmerynda.spring_play.controller;
 
+import com.lmerynda.spring_play.model.Comment;
 import com.lmerynda.spring_play.model.Todo;
+import com.lmerynda.spring_play.repository.CommentRepository;
 import com.lmerynda.spring_play.repository.TodoRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +16,11 @@ import java.util.Optional;
 @RequestMapping("/todos")
 public class TodoController {
     private TodoRepository todoRepository;
+    private CommentRepository commentRepository;
 
-    public TodoController(TodoRepository todoRepository) {
+    public TodoController(TodoRepository todoRepository, CommentRepository commentRepository) {
         this.todoRepository = todoRepository;
+        this.commentRepository = commentRepository;
     }
 
     @PostMapping
@@ -54,5 +58,15 @@ public class TodoController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PostMapping("/{id}/comment")
+    public ResponseEntity<Comment> createComment(@PathVariable("id") UUID todoId, @RequestBody Comment comment) {
+        Optional<Todo> optionalTodo = todoRepository.findById(todoId);
+        if (!optionalTodo.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        comment.setTodo(optionalTodo.get());
+        return ResponseEntity.ok(commentRepository.save(comment));
     }
 }

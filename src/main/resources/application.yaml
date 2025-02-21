@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: spring-play
+  datasource:
+    url: jdbc:h2:mem:testdb
+  h2:
+    console:
+      enabled: true
+  output:
+    ansi:
+      enabled: always
