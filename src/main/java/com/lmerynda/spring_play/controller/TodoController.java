@@ -1,9 +1,12 @@
 package com.lmerynda.spring_play.controller;
 
 import com.lmerynda.spring_play.model.Comment;
+import com.lmerynda.spring_play.model.Person;
 import com.lmerynda.spring_play.model.Todo;
 import com.lmerynda.spring_play.repository.CommentRepository;
+import com.lmerynda.spring_play.repository.PersonRepository;
 import com.lmerynda.spring_play.repository.TodoRepository;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,10 +20,13 @@ import java.util.Optional;
 public class TodoController {
     private TodoRepository todoRepository;
     private CommentRepository commentRepository;
+    private PersonRepository personRepository;
 
-    public TodoController(TodoRepository todoRepository, CommentRepository commentRepository) {
+    public TodoController(TodoRepository todoRepository, CommentRepository commentRepository,
+            PersonRepository personRepository) {
         this.todoRepository = todoRepository;
         this.commentRepository = commentRepository;
+        this.personRepository = personRepository;
     }
 
     @PostMapping
@@ -68,5 +74,23 @@ public class TodoController {
         }
         comment.setTodo(optionalTodo.get());
         return ResponseEntity.ok(commentRepository.save(comment));
+    }
+
+    @PostMapping("/{id}/assign")
+    public ResponseEntity<Todo> assignTodoToPerson(@PathVariable("id") UUID todoId, @RequestBody TodoAssignDto data) {
+        Optional<Todo> optionalTodo = todoRepository.findById(todoId);
+        if (!optionalTodo.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        Todo todo = optionalTodo.get();
+
+        Optional<Person> optionalPerson = personRepository.findById(data.email());
+        if (!optionalPerson.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        todo.setAssignee(optionalPerson.get());
+        todo = todoRepository.save(todo);
+        return ResponseEntity.ok(todo);
     }
 }

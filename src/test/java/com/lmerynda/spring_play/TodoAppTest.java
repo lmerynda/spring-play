@@ -1,11 +1,11 @@
 package com.lmerynda.spring_play;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lmerynda.spring_play.controller.TodoAssignDto;
+import com.lmerynda.spring_play.model.Comment;
+import com.lmerynda.spring_play.model.Person;
 import com.lmerynda.spring_play.model.Todo;
+import com.lmerynda.spring_play.repository.CommentRepository;
+import com.lmerynda.spring_play.repository.PersonRepository;
 import com.lmerynda.spring_play.repository.TodoRepository;
 
 @SpringBootTest
@@ -32,11 +37,21 @@ public class TodoAppTest {
 
     @Autowired
     private TodoRepository todoRepository;
+    @Autowired
+    private PersonRepository personRepository;
+    @Autowired
+    private CommentRepository commentRepository;
 
     @BeforeEach
     public void setup() {
-        todoRepository.save(new Todo("Prepopulated Todo 1", false));
+        var todo = todoRepository.save(new Todo("Prepopulated Todo 1", false));
         todoRepository.save(new Todo("Prepopulated Todo 2", false));
+
+        commentRepository.save(new Comment("Prepopulated Comment 1", todo));
+        commentRepository.save(new Comment("Prepopulated Comment 2", todo));
+        commentRepository.save(new Comment("Prepopulated Comment 3", todo));
+
+        personRepository.save(new Person("person1"));
     }
 
     @Test
@@ -87,5 +102,19 @@ public class TodoAppTest {
     @Test
     public void testGetTodoById_NotFound() throws Exception {
         mockMvc.perform(get("/todos/0000-000-000-000-0000")).andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testAssignTodo() throws Exception {
+        var todo = todoRepository.findAll().get(0);
+        var person = personRepository.findAll().get(0);
+
+        mockMvc.perform(post("/todos/" + todo.getId() + "/assign")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new TodoAssignDto(person.getEmail()))))
+                .andExpect(status().isOk());
+
+        var updatedTodo = todoRepository.findById(todo.getId()).get();
+        assertEquals(person.getEmail(), updatedTodo.getAssignee().get().getEmail());
     }
 }
