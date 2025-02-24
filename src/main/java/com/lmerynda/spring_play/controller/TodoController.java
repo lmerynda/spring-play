@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.UUID;
 
 import java.util.Optional;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/todos")
@@ -66,5 +68,10 @@ public class TodoController {
         Optional<Todo> assignedTodo = todoService.assignTodoToPerson(todoId, data.email());
         return assignedTodo.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("{id}/priority")
+    public void setPriority(@PathVariable("id") UUID todoId, @RequestBody String priority) {
+        todoService.setPriority(todoId, priority);
     }
 }

@@ -87,4 +87,15 @@ public class TodoService {
         todo.setAssignee(optionalPerson.get());
         return Optional.of(todoRepository.save(todo));
     }
+
+    @Transactional
+    public void setPriority(UUID todoId, String priority) {
+        Optional<Todo> optionalTodo = todoRepository.findById(todoId);
+        if (optionalTodo.isEmpty()) {
+            return;
+        }
+        Todo todo = optionalTodo.get();
+        todo.setPriority(priority);
+        todoRepository.save(todo);
+    }
 }

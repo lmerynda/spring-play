@@ -55,7 +55,7 @@ public class TodoAppTest {
     }
 
     @Test
-    public void contextLoads() throws Exception {
+    public void testGetAll() throws Exception {
         mockMvc.perform(get("/todos"))
                 .andExpect(status().isOk());
     }

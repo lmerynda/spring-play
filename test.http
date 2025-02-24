@@ -14,9 +14,18 @@ content-type: application/json
 ###
 
 
-POST http://localhost:8080/todos/c7419a82-0bec-4c38-98ff-f0499bb2fdd0/comment HTTP/1.1
+POST http://localhost:8080/todos/0ba64fa0-6ed6-48ba-b3bf-b145270a90ed/comment HTTP/1.1
 content-type: application/json
 
 {
     "content": "test comment 3"
+}
+
+###
+
+POST http://localhost:8080/todos/0ba64fa0-6ed6-48ba-b3bf-b145270a90ed/priority HTTP/1.1
+content-type: application/json
+
+{
+    "content": "prio1"
 }

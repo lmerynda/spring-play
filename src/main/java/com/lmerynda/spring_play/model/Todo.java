@@ -2,10 +2,10 @@ package com.lmerynda.spring_play.model;
 
 import java.util.Optional;
 
+import java.util.EnumMap;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
@@ -27,12 +27,13 @@ public class Todo {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "todo")
-    @JsonIgnore
     private List<Comment> comments;
 
     @ManyToOne()
     @JoinColumn(name = "assignee_email", nullable = true)
     private Person assignee;
+
+    private EnumMap<TodoMetadataName, String> metadata = new EnumMap<>(TodoMetadataName.class);
 
     public Todo() {
     }
@@ -75,6 +76,18 @@ public class Todo {
     public void update(Todo todoDetails) {
         title = todoDetails.title;
         completed = todoDetails.completed;
+    }
+
+    public String getMetadata() {
+        return metadata.toString();
+    }
+
+    public void addMetadata(TodoMetadataName key, String value) {
+        metadata.put(key, value);
+    }
+
+    public void setPriority(String priority) {
+        metadata.put(TodoMetadataName.PRIORITY, priority);
     }
 
     public void setAssignee(Person assignee) {
