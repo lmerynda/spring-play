@@ -9,12 +9,17 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PostLoad;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Transient;
 
 @Entity
 public class Todo {
@@ -33,7 +38,10 @@ public class Todo {
     @JoinColumn(name = "assignee_email", nullable = true)
     private Person assignee;
 
-    private EnumMap<TodoMetadataName, String> metadata = new EnumMap<>(TodoMetadataName.class);
+    @Embedded
+    TodoMetadata metadata;
+    @Transient
+    EnumMap<TodoMetadataName, String> metadataMap;
 
     public Todo() {
     }
@@ -83,14 +91,25 @@ public class Todo {
     }
 
     public void addMetadata(TodoMetadataName key, String value) {
-        metadata.put(key, value);
+        metadataMap.put(key, value);
     }
 
     public void setPriority(String priority) {
-        metadata.put(TodoMetadataName.PRIORITY, priority);
+        metadataMap.put(TodoMetadataName.PRIORITY, priority);
     }
 
     public void setAssignee(Person assignee) {
         this.assignee = assignee;
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void syncMetadata() {
+        metadata.loadMap(metadataMap);
+    }
+
+    @PostLoad
+    public void loadMetadata() {
+        metadataMap = metadata.toEnumMap();
     }
 }

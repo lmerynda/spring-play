@@ -1,21 +1,33 @@
 package com.lmerynda.spring_play.model;
 
 import java.util.EnumMap;
+import java.util.Map;
 
+import jakarta.persistence.Access;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.AccessType;
 
 @Embeddable
+@Access(AccessType.FIELD)
 public class TodoMetadata {
-    public EnumMap<TodoMetadataName, String> metadata = new EnumMap<>(TodoMetadataName.class);
+    String priority;
+    String deadline;
+    String estimatedTime;
 
     public TodoMetadata() {
     }
 
-    public TodoMetadata(EnumMap<TodoMetadataName, String> metadata) {
-        this.metadata = metadata;
+    public void loadMap(Map<TodoMetadataName, String> resourceMap) {
+        this.priority = resourceMap.get(TodoMetadataName.PRIORITY);
+        this.deadline = resourceMap.get(TodoMetadataName.DEADLINE);
+        this.estimatedTime = resourceMap.get(TodoMetadataName.ESTIMATED_TIME);
     }
 
-    public void addMetadata(TodoMetadataName name, String value) {
-        metadata.put(name, value);
+    public EnumMap<TodoMetadataName, String> toEnumMap() {
+        var map = new EnumMap<TodoMetadataName, String>(TodoMetadataName.class);
+        map.put(TodoMetadataName.PRIORITY, priority);
+        map.put(TodoMetadataName.DEADLINE, deadline);
+        map.put(TodoMetadataName.ESTIMATED_TIME, estimatedTime);
+        return map;
     }
 }
