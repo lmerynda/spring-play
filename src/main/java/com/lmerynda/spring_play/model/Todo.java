@@ -2,7 +2,6 @@ package com.lmerynda.spring_play.model;
 
 import java.util.Optional;
 
-import java.util.EnumMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,10 +15,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.PostLoad;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Transient;
 
 @Entity
 public class Todo {
@@ -39,20 +34,12 @@ public class Todo {
     private Person assignee;
 
     @Embedded
-    TodoMetadata metadata;
-    @Transient
-    EnumMap<TodoMetadataName, String> metadataMap;
+    TodoMetadata metadata = new TodoMetadata();
 
     public Todo() {
     }
 
     public Todo(String title, boolean completed) {
-        this.title = title;
-        this.completed = completed;
-    }
-
-    // TODO delete?
-    public Todo(UUID id, String title, boolean completed) {
         this.title = title;
         this.completed = completed;
     }
@@ -91,25 +78,14 @@ public class Todo {
     }
 
     public void addMetadata(TodoMetadataName key, String value) {
-        metadataMap.put(key, value);
+        metadata.data.put(key, value);
     }
 
     public void setPriority(String priority) {
-        metadataMap.put(TodoMetadataName.PRIORITY, priority);
+        metadata.data.put(TodoMetadataName.PRIORITY, priority);
     }
 
     public void setAssignee(Person assignee) {
         this.assignee = assignee;
-    }
-
-    @PrePersist
-    @PreUpdate
-    public void syncMetadata() {
-        metadata.loadMap(metadataMap);
-    }
-
-    @PostLoad
-    public void loadMetadata() {
-        metadataMap = metadata.toEnumMap();
     }
 }

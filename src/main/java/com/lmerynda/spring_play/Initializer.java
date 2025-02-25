@@ -6,6 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import com.lmerynda.spring_play.model.Todo;
+import com.lmerynda.spring_play.model.TodoMetadataName;
 import com.lmerynda.spring_play.repository.TodoRepository;
 
 @Component
@@ -21,7 +22,11 @@ public class Initializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         log.info("Initializing data");
-        todoRepository.save(new Todo("example", false));
+        var todo = new Todo("example", false);
+        todo.addMetadata(TodoMetadataName.DEADLINE, "yesterday");
+        todo.addMetadata(TodoMetadataName.ESTIMATED_TIME, "tomorrow");
+        todo.addMetadata(TodoMetadataName.PRIORITY, "High");
+        todoRepository.save(todo);
         log.info("Data initialization completed");
     }
 }

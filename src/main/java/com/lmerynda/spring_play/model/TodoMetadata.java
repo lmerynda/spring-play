@@ -4,8 +4,12 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import jakarta.persistence.Access;
-import jakarta.persistence.Embeddable;
 import jakarta.persistence.AccessType;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.PostLoad;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Transient;
 
 @Embeddable
 @Access(AccessType.FIELD)
@@ -13,6 +17,9 @@ public class TodoMetadata {
     String priority;
     String deadline;
     String estimatedTime;
+
+    @Transient
+    EnumMap<TodoMetadataName, String> data = new EnumMap<>(TodoMetadataName.class);
 
     public TodoMetadata() {
     }
@@ -29,5 +36,16 @@ public class TodoMetadata {
         map.put(TodoMetadataName.DEADLINE, deadline);
         map.put(TodoMetadataName.ESTIMATED_TIME, estimatedTime);
         return map;
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void syncMetadata() {
+        loadMap(data);
+    }
+
+    @PostLoad
+    public void loadMetadata() {
+        data = toEnumMap();
     }
 }
