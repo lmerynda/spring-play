@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -31,6 +33,7 @@ public class Todo {
 
     @ManyToOne()
     @JoinColumn(name = "assignee_email", nullable = true)
+    @JsonIgnoreProperties("assignedTodos")
     private Person assignee;
 
     @Embedded
@@ -73,8 +76,9 @@ public class Todo {
         completed = todoDetails.completed;
     }
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getMetadata() {
-        return metadata.toString();
+        return metadata == null ? "" : metadata.toString();
     }
 
     public void addMetadata(TodoMetadataName key, String value) {
